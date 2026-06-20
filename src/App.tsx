@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./App.css";
 import { useAppStore } from "./store/appStore";
 import { TabBar } from "./components/TabBar";
@@ -8,7 +9,19 @@ import { SkillsView } from "./components/SkillsView";
 import { LevelsView } from "./components/LevelsView";
 
 function App() {
-  const { activeTab } = useAppStore();
+  const { activeTab, dbReady, loadAll } = useAppStore();
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
+
+  if (!dbReady) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-bg paper-bg">
+        <span className="text-text-muted text-lg font-hand">loading...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-bg paper-bg">
