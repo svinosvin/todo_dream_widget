@@ -27,6 +27,27 @@ export async function getAllSkills(): Promise<Skill[]> {
   return rows.map(rowToSkill);
 }
 
+export async function seedDefaultSkills(): Promise<void> {
+  const existing = await getAllSkills();
+  if (existing.length > 0) return;
+
+  const defaults = [
+    { name: "TypeScript", image: "TS" },
+    { name: "Rust", image: "RS" },
+    { name: "SQL", image: "DB" },
+    { name: "English", image: "EN" },
+    { name: "Twitter", image: "TW" },
+  ];
+
+  const db = await getDb();
+  for (const s of defaults) {
+    await db.execute(
+      "INSERT INTO skills (id, name, image) VALUES (?, ?, ?)",
+      [crypto.randomUUID(), s.name, s.image]
+    );
+  }
+}
+
 export async function createSkill(name: string): Promise<string> {
   const db = await getDb();
   const id = crypto.randomUUID();

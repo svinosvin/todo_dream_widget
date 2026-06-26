@@ -99,6 +99,13 @@ export function SkillsView() {
 
                   <div className="flex items-center gap-2 mt-2">
                     <input
+                      value={skill.image}
+                      onChange={(e) => updateSkill(skill.id, { image: e.target.value })}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder="icon"
+                      className="w-14 sketchy-sm bg-bg px-2 py-1 text-sm text-center outline-none focus:border-accent"
+                    />
+                    <input
                       value={skill.name}
                       onChange={(e) => updateSkill(skill.id, { name: e.target.value })}
                       onClick={(e) => e.stopPropagation()}

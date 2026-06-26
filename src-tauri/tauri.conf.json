@@ -12,8 +12,13 @@
   "app": {
     "windows": [
       {
-        "title": "todo_vidget",
-        "width": 800,
+        "title": "Solo warrior",
+        "alwaysOnTop": false,
+        "decorations": false,
+        "transparent": true,
+        "resizable": false,
+        "skipTaskbar": true,
+        "width": 400,
         "height": 600
       }
     ],

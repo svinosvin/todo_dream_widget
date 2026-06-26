@@ -8,7 +8,7 @@ function getWeekDays(offset: number): { label: string; date: string; isToday: bo
   monday.setDate(monday.getDate() + diff + offset * 7);
 
   const days: { label: string; date: string; isToday: boolean }[] = [];
-  const labels = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const todayStr = now.toISOString().split("T")[0];
 
   for (let i = 0; i < 7; i++) {
@@ -44,14 +44,14 @@ export function TableView() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setWeekOffset(weekOffset - 1)}
-          className="sketchy-sm px-3 py-1 text-text-muted hover:text-text cursor-pointer"
+          className="sketchy-sm px-3 py-1 text-text-muted hover:text-text cursor-pointer text-lg"
         >
           &lt;
         </button>
-        <span className="text-lg font-hand text-text-muted">{formatWeekRange(weekOffset)}</span>
+        <span className="text-xl font-hand text-text-muted">{formatWeekRange(weekOffset)}</span>
         <button
           onClick={() => setWeekOffset(weekOffset + 1)}
-          className="sketchy-sm px-3 py-1 text-text-muted hover:text-text cursor-pointer"
+          className="sketchy-sm px-3 py-1 text-text-muted hover:text-text cursor-pointer text-lg"
         >
           &gt;
         </button>
@@ -63,19 +63,26 @@ export function TableView() {
           {days.map((d) => (
             <div
               key={d.date}
-              className={`text-center py-2 text-sm font-hand border-r border-border last:border-r-0
-                ${d.isToday ? "text-accent" : "text-text-muted"}`}
+              className={`text-center py-2 text-base font-hand border-r border-border last:border-r-0
+                ${d.isToday ? "text-accent font-bold" : "text-text-muted"}`}
             >
               {d.label}
-              <div className="text-xs">{d.date.split("-")[2]}</div>
+              <div className="text-sm">{d.date.split("-")[2]}</div>
             </div>
           ))}
         </div>
 
         {/* Task cells */}
-        <div className="grid grid-cols-7 min-h-[300px]">
+        <div className="grid grid-cols-7 min-h-[360px]">
           {days.map((d) => {
-            const dayTasks = tasks.filter((t) => t.date === d.date);
+            const dayTasks = tasks.filter((t) => {
+              if (t.date === d.date) return true;
+              if (t.recurring === "daily") return true;
+              if (t.recurring === "weekly" && t.date) {
+                return new Date(t.date).getDay() === new Date(d.date).getDay();
+              }
+              return false;
+            });
             return (
               <div
                 key={d.date}
@@ -86,7 +93,7 @@ export function TableView() {
                   <button
                     key={t.id}
                     onClick={() => toggleDone(t.id)}
-                    className={`text-xs p-1 rounded border cursor-pointer text-left truncate
+                    className={`text-sm p-1.5 rounded border cursor-pointer text-left truncate leading-tight
                       ${t.done ? "opacity-40 line-through" : ""}
                       ${PRIORITY_COLOR[t.priority]}`}
                   >

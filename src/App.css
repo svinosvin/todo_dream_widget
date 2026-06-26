@@ -1,28 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #1a1a2e;
-  --color-surface: #16213e;
-  --color-surface-hover: #1a2747;
-  --color-border: #2a3a5c;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
-  --color-accent: #3b82f6;
-  --color-priority-must: #ef4444;
-  --color-priority-wait: #f59e0b;
-  --color-priority-ok: #22c55e;
-  --color-done: #22c55e;
+  --color-bg: #f7f3ee;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0ebe4;
+  --color-border: #c9bba8;
+  --color-text: #33302c;
+  --color-text-muted: #8a8078;
+  --color-accent: #5b8def;
+  --color-priority-must: #e8453c;
+  --color-priority-wait: #e8a830;
+  --color-priority-ok: #4caf50;
+  --color-done: #4caf50;
   --font-hand: "Caveat", "Patrick Hand", cursive;
   --font-ui: "Patrick Hand", "Caveat", cursive;
 }
 
-body {
+html, body {
   margin: 0;
-  background-color: var(--color-bg);
+  background: transparent;
   color: var(--color-text);
   font-family: var(--font-ui);
   font-size: 16px;
   user-select: none;
+}
+
+.widget-shell {
+  background-color: var(--color-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.drag-region button, .drag-region input, .drag-region select {
+  -webkit-app-region: no-drag;
 }
 
 * {
@@ -95,6 +110,10 @@ button {
 /* Paper texture background */
 .paper-bg {
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(42, 58, 92, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      rgba(201, 187, 168, 0.13) 31px,
+      rgba(201, 187, 168, 0.13) 32px
+    );
 }

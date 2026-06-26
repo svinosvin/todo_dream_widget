@@ -6,6 +6,8 @@ export interface Subtask {
   id: string;
   title: string;
   done: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Task {
@@ -16,6 +18,7 @@ export interface Task {
   done: boolean;
   date: string;
   skillId: string;
+  recurring: "daily" | "weekly" | null;
   subtasks: Subtask[];
   createdAt: string;
   updatedAt: string;
@@ -27,6 +30,7 @@ export interface Skill {
   image: string;
   totalPoints: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export function pointsForLevel(level: number): number {

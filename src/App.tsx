@@ -17,14 +17,14 @@ function App() {
 
   if (!dbReady) {
     return (
-      <div className="h-screen flex items-center justify-center bg-bg paper-bg">
+      <div className="h-screen flex items-center justify-center widget-shell paper-bg">
         <span className="text-text-muted text-lg font-hand">loading...</span>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-bg paper-bg">
+    <div className="h-screen flex flex-col widget-shell paper-bg">
       <TabBar />
       {activeTab === "tasks" && <Header />}
       {activeTab === "table" && <TableView />}

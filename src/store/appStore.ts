@@ -1,11 +1,9 @@
 import { create } from "zustand";
-import type { Task, Priority, Skill, TabId } from "../types";
+import type { Task, Skill, TabId } from "../types";
 import * as tasksDb from "../db/Tasks";
 import * as skillsDb from "../db/Skills";
 import * as subtasksDb from "../db/Subtasks";
 import * as dailyLogsDb from "../db/DailyLogs";
-
-const PRIORITY_CYCLE: Priority[] = ["ok", "wait", "must"];
 
 interface AppState {
   activeTab: TabId;
@@ -13,6 +11,9 @@ interface AppState {
 
   weekOffset: number;
   setWeekOffset: (offset: number) => void;
+
+  dayOffset: number;
+  setDayOffset: (offset: number) => void;
 
   tasks: Task[];
   expandedTaskId: string | null;
@@ -26,11 +27,12 @@ interface AppState {
 
   loadAll: () => Promise<void>;
 
-  addTask: (title: string) => Promise<void>;
+  addTask: (title: string, date?: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   toggleDone: (id: string) => Promise<void>;
   cyclePriority: (id: string) => Promise<void>;
-  updateTask: (id: string, updates: Partial<Pick<Task, "title" | "description" | "date" | "skillId" | "priority">>) => Promise<void>;
+  updateTask: (id: string, updates: Partial<Pick<Task, "title" | "description" | "date" | "skillId" | "priority" | "recurring">>) => Promise<void>;
+  duplicateTask: (id: string, currentDate?: string, howManyDays?: number) => Promise<void>;
   setExpandedTask: (id: string | null) => void;
   setSortBy: (sort: "date" | "priority" | "status") => void;
   setFilterSkillId: (id: string) => void;
@@ -53,12 +55,27 @@ async function loadTasksWithSubtasks(): Promise<Task[]> {
   return tasks;
 }
 
+
+function getNextDate(currentDate: string, countDays?: number): string {
+
+  const base = currentDate? new Date(currentDate) : new Date();
+
+  if(countDays){
+      base.setDate(base.getDate() + countDays);
+  }
+
+  return base.toISOString().split("T")[0];
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   activeTab: "tasks",
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   weekOffset: 0,
   setWeekOffset: (offset) => set({ weekOffset: offset }),
+
+  dayOffset: 0,
+  setDayOffset: (offset) => set({ dayOffset: offset }),
 
   tasks: [],
   expandedTaskId: null,
@@ -71,13 +88,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   dbReady: false,
 
   loadAll: async () => {
+
     const tasks = await loadTasksWithSubtasks();
     const skills = await skillsDb.getAllSkills();
     set({ tasks, skills, dbReady: true });
   },
 
-  addTask: async (title) => {
-    await tasksDb.createTask(title);
+  addTask: async (title, date?) => {
+    await tasksDb.createTask(title, date);
     const tasks = await loadTasksWithSubtasks();
     set({ tasks });
   },
@@ -121,6 +139,19 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ tasks });
   },
 
+  duplicateTask: async (id, currentDate, howManyDays) => {
+    const base = currentDate ?? new Date().toISOString().split("T")[0];
+    if (howManyDays) {
+      for (let i = 1; i <= howManyDays; i++) {
+        await tasksDb.duplicateTask(id, getNextDate(base, i));
+      }
+    } else {
+      await tasksDb.duplicateTask(id);
+    }
+    const tasks = await loadTasksWithSubtasks();
+    set({ tasks });
+  },
+
   setExpandedTask: (id) =>
     set((s) => ({ expandedTaskId: s.expandedTaskId === id ? null : id })),
 
@@ -142,7 +173,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ tasks });
   },
 
-  deleteSubtask: async (taskId, subtaskId) => {
+  deleteSubtask: async (_taskId, subtaskId) => {
     await subtasksDb.deleteSubtask(subtaskId);
     const tasks = await loadTasksWithSubtasks();
     set({ tasks });
